@@ -1,0 +1,5 @@
+# https://devblogs.microsoft.com/visualstudio/building-a-new-javascript-linting-experience-in-visual-studio/
+steps:
+  - script:
+      yarn eslint .
+    displayName: 'run linter'

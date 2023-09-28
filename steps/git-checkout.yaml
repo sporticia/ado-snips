@@ -1,0 +1,8 @@
+steps:
+  # shallow checkout without tags for speed
+  - checkout: self
+    displayName: 'git checkout'
+    submodules: true
+    persistCredentials: true
+    fetchTags: false
+    fetchDepth: 1

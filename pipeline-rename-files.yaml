@@ -1,0 +1,17 @@
+# Loop to add prefix to filenames
+- script: |
+    echo 'List all files'
+    ls -l /folder1/folder2/folder3/etc
+    echo -e "/n/n"
+    echo 'Listing matching files'
+    for f in $(find . -name '*.ext'); do echo "found file $f"; done
+    echo -e "/n/n"
+    echo 'Renaming matching files'
+    for f in $(find . -name '*.txt'); do mv "$f" "$(dirname "$f")/prefix-$(basename "$f")"; done
+    echo -e "/n/n"
+    echo 'Listing all files'
+    ls -l /folder1/folder2/folder3/etc
+    echo -e "/n/n"
+    echo 'Coping file to staging area'
+    cp -av folder1/folder2/folder3/etc/* $(build.artifactStagingDirectory)
+

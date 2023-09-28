@@ -1,0 +1,20 @@
+# NOTE: Use CacheBeta@1 NOT Cache@2 (Cache@2 is buggy)
+steps:
+  - task: CacheBeta@1
+    inputs:
+      path: .jest-cache
+      key: package.json
+    displayName: 'Use Jest cache'
+    env:
+      VSO_DEDUP_REDIRECT_TIMEOUT_IN_SEC: 5
+
+  # Pass the test job shard number as a param from the calling pipeline job
+  - script: |
+      TARGET=native node_modules/jest-expo/bin/jest.js --maxWorkers=100% --forceExit --shard ${{ parameters.shard }}
+    displayName: 'tests: running jestJS test shard ${{ parameters.shard }}'
+
+  # NOTE: Look into mergeTestResults: true/false (defaults to false, not sure of time impact if enabled)
+  - task: PublishTestResults@2
+    displayName: 'tests: publish test results'
+    inputs:
+      testResultsFiles: '**/junit.xml'

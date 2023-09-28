@@ -1,0 +1,116 @@
+trigger:
+  - main
+
+pool:
+  vmImage: macos-latest
+
+variables:
+  - name: ORGANIZATION
+    value: 'https://dev.azure.com/megacorp/'
+  - name: PROJECT
+    value: project-a
+  - name: AZURE_DEVOPS_EXT_PAT
+    value: (System.AccessToken)
+
+stages:
+  - stage: build
+    jobs:
+      # max parallel "stuff", lint and prettier can run at the same time, each will need the repo checked out
+      # and node/yarn installed to run correctly
+      - job: lint
+        displayName: 'run: lint'
+        steps:
+          - template: ./steps/git-checkout.yaml
+          - template: ./steps/node_install.yaml
+          - template: ./steps/yarn_install.yaml
+          - template: ./steps/lint.yaml
+
+      - job: prettier
+        displayName: 'run: prettier'
+        steps:
+          - template: ./steps/git-checkout.yaml
+          - template: ./steps/node_install.yaml
+          - template: ./steps/yarn_install.yaml
+          - template: ./steps/prettier.yaml
+
+      # run each jest passing a shard value to split them and process in parallel
+      - job: test1
+        displayName: 'test shard 1'
+        steps:
+          - template: ./steps/git-checkout.yaml
+          - template: ./steps/node_install.yaml
+          - template: ./steps/yarn_install.yaml
+          - template: ./steps/jest_tests.yaml
+            parameters:
+              shard: 1/4
+
+      - job: test2
+        displayName: 'test shard 2'
+        steps:
+          - template: ./steps/git-checkout.yaml
+          - template: ./steps/node_install.yaml
+          - template: ./steps/yarn_install.yaml
+          - template: ./steps/jest_tests.yaml
+            parameters:
+              shard: 2/4
+
+      - job: test3
+        displayName: 'test shard 3'
+        steps:
+          - template: ./steps/git-checkout.yaml
+          - template: ./steps/node_install.yaml
+          - template: ./steps/yarn_install.yaml
+          - template: ./steps/jest_tests.yaml
+            parameters:
+              shard: 3/4
+
+      - job: test4
+        displayName: 'test shard 4'
+        steps:
+          - template: ./steps/git-checkout.yaml
+          - template: ./steps/node_install.yaml
+          - template: ./steps/yarn_install.yaml
+          - template: ./steps/jest_tests.yaml
+            parameters:
+              shard: 4/4
+
+#      - job: test5
+#        displayName: 'test shard 5'
+#        steps:
+#          - template: ./steps/git-checkout.yaml
+#          - template: ./steps/node_install.yaml
+#          - template: ./steps/yarn_install.yaml
+#          - template: ./steps/jest_tests.yaml
+#            parameters:
+#              shard: 5/8
+#
+#      - job: test6
+#        displayName: 'test shard 6'
+#        steps:
+#          - template: ./steps/git-checkout.yaml
+#          - template: ./steps/node_install.yaml
+#          - template: ./steps/yarn_install.yaml
+#          - template: ./steps/jest_tests.yaml
+#            parameters:
+#              shard: 6/8
+#
+#      - job: test7
+#        displayName: 'test shard 7'
+#        steps:
+#          - template: ./steps/git-checkout.yaml
+#          - template: ./steps/node_install.yaml
+#          - template: ./steps/yarn_install.yaml
+#          - template: ./steps/jest_tests.yaml
+#            parameters:
+#              shard: 7/8
+#
+#      - job: test8
+#        displayName: 'test shard 8'
+#        steps:
+#          - template: ./steps/git-checkout.yaml
+#          - template: ./steps/node_install.yaml
+#          - template: ./steps/yarn_install.yaml
+#          - template: ./steps/jest_tests.yaml
+#            parameters:
+#              shard: 8/8
+#

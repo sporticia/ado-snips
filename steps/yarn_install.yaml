@@ -1,0 +1,25 @@
+parameters:
+  - name: YARN_CACHE_FOLDER
+    type: string
+    default: $(Pipeline.Workspace)/.yarn_cache
+
+steps:
+  - script: |
+      echo 'do something'
+    displayName: 'run script'
+
+  - task: CacheBeat@1
+    inputs:
+      key: 'yarn.lock'
+      path: 'node_modules'
+      cacheHitVar: nodeRestored
+    displayName: 'Node cache'
+    env:
+      VSO_DEDUP_REDIRECT_TIMEOUT_IN_SEC: 10
+
+  - script : |
+        yarn install --frozen-lockfile
+    displayName: 'yarn install'
+    condition: eq(variables.nodeRestored, 'false')
+    env:
+      YARN_CACHE_FOLDER: ${{ parameters.YARN_CACHE_FOLDER}}

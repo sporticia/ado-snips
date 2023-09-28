@@ -1,0 +1,61 @@
+trigger:
+  batch: false
+  branches:
+    include:
+      - main
+
+parameters:
+  - name: 'app1'
+    displayName: 'app1'
+    type: boolean
+    default: true
+
+  - name: 'app2'
+    displayName: 'app2'
+    type: boolean
+    default: true
+
+jobs:
+  - ${{ if eq(parameters.app1, true ) }}:
+    - job: app1
+      displayName: app1
+      pool:
+        vmImage: linux-latest
+
+      steps:
+        - task: DownloadSecureFile@1
+          name: app1SecureFile
+          displayName: 'Download app1 secure file'
+          inputs:
+            secureFile: 'app1-dotenv-dev'
+
+        - script: |
+            mv $(secureFile.secureFilePath) $(Build.ArtifactStagigDirectory)/
+          displayName: Copy file
+
+        - task: PublishBuildArtifact@1
+          inputs:
+            pathToPublish: '$(Build.ArtifactStagingDirectory)'
+            artifactName: drop
+
+  - ${{ if eq(parameters.app2, true ) }}:
+    - job: app2
+      displayName: app2
+      pool:
+        vmImage: linux-latest
+
+      steps:
+        - task: DownloadSecureFile@1
+          name: app2SecureFile
+          displayName: 'Download app2 secure file'
+          inputs:
+            secureFile: 'app2-dotenv-dev'
+
+        - script: |
+            mv $(secureFile.secureFilePath) $(Build.ArtifactStagigDirectory)/
+          displayName: Copy file
+
+        - task: PublishBuildArtifact@1
+          inputs:
+            pathToPublish: '$(Build.ArtifactStagingDirectory)'
+            artifactName: drop
