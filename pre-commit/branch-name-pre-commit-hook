@@ -1,0 +1,20 @@
+#!/bin/bash
+
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+local_branch="$(git rev-parse --abbrev-ref HEAD)"
+valid_branch_regex="^(bugfix|hotfix|feature|maintenance|release|spike)\/[a-zA-Z0-9\-]+$"
+
+if [[ ! $local_branch =~ $valid_branch_regex ]]
+then
+  echo "\nYour branch ${bold}$local_branch${normal} has an invalid name. It must match: $valid_branch_regex."
+  echo "\nPlease rename your branch to comply with these requirements."
+  echo "\n${bold}git branch -m old-branch-name new-branch-name${normal}"
+  echo " ${bold}git push origin --delete old-name (may fail due to permissions)${normal}"
+  echo " ${bold}git push origin -u new-name${normal}"
+
+  echo "\n For example ${bold}fix/JIRA-xxxx-human-readable-subject${normal} \n"
+  exit 1
+fi
+
